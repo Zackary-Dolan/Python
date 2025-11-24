@@ -29,22 +29,19 @@ def testData():
 
     text.insert(END, '\n\nAccuracy ' + str(int(accuracy*100)) + '%')
 def makeNewPrediction():
-
     driverId = int(entry41.get())
     constructorId= int(entry42.get())
     number  = int(entry43.get())
     position  = int(entry44.get())
-    q1  = int(entry44a.get())
+    q1  = decisionTree.lap_to_seconds(entry44a.get())
+    q2 = decisionTree.lap_to_seconds(entry46a.get())
+    # q3  = decisionTree.lap_to_seconds(entry44b.get())
     q3 = 0
-    if (q3.get()=='Yes'):
-        q3 = 1
-
-    print('Exercise Angina:', q3)
-    prediction_Res = decisionTree.makePrediction(driverId, constructorId, number,position,
-                                    q1,q3)
-    result='Normal'
+    print('Q3 Appearance:', q3)
+    prediction_Res = decisionTree.makePrediction(driverId, constructorId, number,q1,q2)
+    result='No Q3 Appearance'
     if (prediction_Res==1):
-        result = 'Heart Disease'
+        result = 'Q3 appearance'
     entry45.delete(0, END)
     entry45.insert(END, result)
 
@@ -121,25 +118,29 @@ entry44a = Entry(frame)
 entry44a.insert(END, '')
 entry44a.grid(row=9, column=1, sticky=W+E)
 
-label44b= Label(frame, text="Q3", fg="blue", width=15, font=("arial", 10, "bold"))   #
-label44b.grid(row=10, column=0, sticky=W+E)
-#entry44b = Entry(frame)
-#entry44b.insert(END, '')
-#entry44b.grid(row=10, column=1, sticky=W+E)
-list2 = ['Yes', 'No']
-q3 = StringVar()
-combo2 = OptionMenu(frame, q3, *list2)
-q3.set("No")
-combo2.grid(row=10, column=1, sticky=W+E)
+# label44b= Label(frame, text="Q3", fg="blue", width=15, font=("arial", 10, "bold"))   #
+# label44b.grid(row=10, column=0, sticky=W+E)
+# entry44b = Entry(frame)
+# entry44b.insert(END, '')
+# entry44b.grid(row=10, column=1, sticky=W+E)
+# list2 = ['Yes', 'No']
+# q3Var = StringVar()
+# combo2 = OptionMenu(frame, q3Var, *list2)
+# q3Var.set("No")
+# combo2.grid(row=10, column=1, sticky=W+E)
 
-
+label46a= Label(frame, text="Q2", fg="blue", width=15, font=("arial", 10, "bold"))   #
+label46a.grid(row=11, column=0, sticky=W+E)
+entry46a = Entry(frame)
+entry46a.insert(END, '')
+entry46a.grid(row=11, column=1, sticky=W+E)
 
 
 button3 = Button(frame, text="Make Prediction", fg="black", font=("arial", 10, "bold"), command=makeNewPrediction)
-button3.grid(row=11, column=0, sticky=W+E)
+button3.grid(row=12, column=0, sticky=W+E)
 entry45 = Entry(frame)
 entry45.insert(END, '')
-entry45.grid(row=11, column=1, sticky=W+E)
+entry45.grid(row=12, column=1, sticky=W+E)
 
 #canvas = Canvas(window, width = 390, height = 390)
 #canvas.place(x=1,y=460)
@@ -149,16 +150,16 @@ entry45.grid(row=11, column=1, sticky=W+E)
 
 #canvas.create_imdriverId(1,1,  anchor='nw', imdriverId=imdriverId)
 label02a = Label(frame, text="      ", fg="red", font=("arial", 16, "bold"))
-label02a.grid(row=12, column=0, columnspan=2,sticky=W+E)
+label02a.grid(row=13, column=0, columnspan=2,sticky=W+E)
 label03b = Label(frame, text="Normal Values", fg="red", font=("arial", 14, "bold"))
-label03b.grid(row=13, column=0, columnspan=2,sticky=W+E)
+label03b.grid(row=14, column=0, columnspan=2,sticky=W+E)
 
 textb = Text(frame, height = 6, width = 12 )
-textb.grid(row=14, column=0, columnspan=2,ipadx=100)
-textb.insert(END, '\nResting Systolic Blood Pressure < 120')
-textb.insert(END, '\nnumber <200')
-textb.insert(END, '\nResting ECG (0-2):  Normal=0')
-textb.insert(END, '\nMax Heart Rate:  Normal= (220 - driverId)')
+textb.grid(row=15, column=0, columnspan=2,ipadx=100)
+textb.insert(END, '\nGun')
+textb.insert(END, '\nNo numbers ever')
+textb.insert(END, '\nResting ecg - 100million')
+textb.insert(END, '\nheart rate = Formula 1 + gun at head :)')
                           # place on screen
 
 mainloop()
