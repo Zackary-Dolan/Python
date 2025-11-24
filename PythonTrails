@@ -8,13 +8,11 @@ import pandas as pd
 class Quali_Machine_Learning:
 
     def __init__(self, csv_file='qualifying.csv'):
-        # Load the dataset
         self.df = pd.read_csv(csv_file)
 
         for col in ['q1', 'q2', 'q3']:
             self.df[col] = self.df[col].apply(self.lap_to_seconds)
 
-        # Create target: top 10 positions = 1, others = 0
         self.df["Target"] = (self.df["position"] <= 10).astype(int)
 
         self.feature_columns = ['driverId', 'constructorId', 'number', 'q1', 'q2']
@@ -22,24 +20,20 @@ class Quali_Machine_Learning:
         # self.Y = self.df['Target']
         self.X = self.df[self.feature_columns]
         self.Y = self.df['Target']
-        # Seed for reproducibility
         self.seedValue = 1
 
-        # Train/test placeholders
         self.X_train = None
         self.X_test = None
         self.Y_train = None
         self.Y_test = None
 
-        # Initialize Decision Tree
         self.tree = DecisionTreeClassifier()
         self.Y_hat = None
         self.cm = None
 
         print("Target column added and lap times converted.")
 
-    def lap_to_seconds(self, t):
-        """Convert lap time from 'm:ss.sss' to seconds, handle missing values."""
+    def lap_to_seconds(self, t):#converts the times so they can be used
         if pd.isna(t) or t == '':
             return 0.0
         t = str(t).strip()
@@ -48,7 +42,6 @@ class Quali_Machine_Learning:
                 mins, secs = t.split(':')
                 return int(mins) * 60 + float(secs)
             except ValueError:
-                # Handle bad format
                 return 0.0
         else:
             return float(t)
@@ -57,7 +50,6 @@ class Quali_Machine_Learning:
         self.seedValue = newValue
 
     def trainData(self, test_fraction=0.2):
-        """Split the data and train the decision tree."""
         self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_split(
             self.X, self.Y, test_size=test_fraction,
             random_state=self.seedValue, stratify=self.Y
@@ -67,7 +59,6 @@ class Quali_Machine_Learning:
         print("Decision Tree trained successfully.")
 
     def makePrediction(self,driverId, constructorId, number,q1, q2):
-        """Predict top-10 qualifying using provided data."""
         # Convert lap times
         q1 = self.lap_to_seconds(q1)
         q2 = self.lap_to_seconds(q2)
@@ -79,7 +70,6 @@ class Quali_Machine_Learning:
         return self.tree.predict(df2)[0]
 
     def testData(self):
-        """Test the model on the held-out test set."""
         self.Y_hat = self.tree.predict(self.X_test)
 
         accuracy = accuracy_score(self.Y_test, self.Y_hat)
@@ -91,7 +81,6 @@ class Quali_Machine_Learning:
         return cm, accuracy
 
     def readCategories(self):
-        """Return string representation of categories."""
         result = ''
         index = 0
         setOfCategories = set(self.Y)
@@ -104,3 +93,20 @@ class Quali_Machine_Learning:
                 result += "Qualified top 10"
             index += 1
         return result
+
+    def get_driver_average_times(self, driverId):
+        df_driver = self.df[self.df["driverId"] == driverId]
+
+        if df_driver.empty:
+            return None  # driver not found
+
+        avg_q1 = df_driver["q1"].replace(0, pd.NA).mean()
+        avg_q2 = df_driver["q2"].replace(0, pd.NA).mean()
+        avg_q3 = df_driver["q3"].replace(0, pd.NA).mean()
+
+        return {
+            "driverId": driverId,
+            "Q1": avg_q1,
+            "Q2": avg_q2,
+            "Q3": avg_q3
+        }
