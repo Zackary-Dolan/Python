@@ -81,16 +81,12 @@ def show_confusion_matrix_popup(cm):
     if heatmap_popup is not None and heatmap_popup.winfo_exists():
         heatmap_popup.destroy()
 
-
     heatmap_popup = ctk.CTkToplevel()
     heatmap_popup.title("Confusion Matrix")
     heatmap_popup.geometry("420x420")
 
     fig, ax = plt.subplots(figsize=(4, 4))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
-                xticklabels=["Not Top 10", "Top 10"],
-                yticklabels=["Not Top 10", "Top 10"],
-                ax=ax)
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,xticklabels=["Not Top 10", "Top 10"], yticklabels=["Not Top 10", "Top 10"],ax=ax)
 
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Actual")
@@ -100,7 +96,6 @@ def show_confusion_matrix_popup(cm):
     canvas.draw()
     canvas.get_tk_widget().pack(pady=10)
 
-    # Close button
     close_btn = ctk.CTkButton(heatmap_popup, text="Close", command=heatmap_popup.destroy)
     close_btn.pack(pady=10)
 
@@ -143,22 +138,13 @@ def show_driver_avg_popup(driver_list):
 frame = ctk.CTkFrame(window, width=450, height=450)
 frame.place(x=10, y=100)
 
-label0 = ctk.CTkLabel(window, text="F1 Q3 appearance",
-                      text_color="gray",
-                      fg_color="white",
-                      corner_radius=8,
-                      font=("Arial", 16, "bold"))
+label0 = ctk.CTkLabel(window, text="F1 Q3 appearance", text_color="gray", fg_color="white",corner_radius=8,font=("Arial", 16, "bold"))
 label0.place(x=202, y=30)
 
-label01 = ctk.CTkLabel(window,
-                       text="First Enter Seed",
-                       text_color="red",
-                       font=("Arial", 11, "bold"))
+label01 = ctk.CTkLabel(window, text="First Enter Seed",text_color="red", font=("Arial", 11, "bold"))
 label01.place(x=235, y=70)
 
-label1 = ctk.CTkLabel(frame, text="      Enter Seed     ",
-                      text_color="white",
-                      font=("Arial", 10, "bold"))
+label1 = ctk.CTkLabel(frame, text="      Enter Seed     ",text_color="white",font=("Arial", 10, "bold"))
 label1.grid(row=0, column=0, sticky="ew")
 
 list1 = ['1', '2', '3', '4', '5']
@@ -167,19 +153,13 @@ combo1 = ctk.CTkOptionMenu(frame, variable=seedsVar, values=list1)
 seedsVar.set("1")
 combo1.grid(row=0, column=1, sticky="ew")
 
-button1 = ctk.CTkButton(frame, text="Train Data",
-                        command=trainData,
-                        font=("Arial", 10, "bold"))
+button1 = ctk.CTkButton(frame, text="Train Data",ommand=trainData,font=("Arial", 10, "bold"))
 button1.grid(row=1, column=0, sticky="ew")
 
-button2 = ctk.CTkButton(frame, text="Show HeatMap of Data",
-                        command=testData,
-                        font=("Arial", 10, "bold"))
+button2 = ctk.CTkButton(frame, text="Show HeatMap of Data",command=testData,font=("Arial", 10, "bold"))
 button2.grid(row=1, column=1, sticky="ew")
 
-label3 = ctk.CTkLabel(frame, text="Output",
-                      text_color="white",
-                      font=("Arial", 10, "bold"))
+label3 = ctk.CTkLabel(frame, text="Output",text_color="white",font=("Arial", 10, "bold"))
 label3.grid(row=2, column=0)
 
 text = ctk.CTkTextbox(frame, height=140, width=250)
@@ -194,7 +174,6 @@ label03 = ctk.CTkLabel(frame, text="Enter Data For Q3 Prediction",
                        font=("Arial", 15, "bold"))
 label03.place(x=165, y=196)
 
-# ---------------------------- INPUTS ----------------------------
 
 label41 = ctk.CTkLabel(frame, text="driverId", text_color="white", font=("Arial", 10, "bold"))
 label41.grid(row=5, column=0, sticky="ew")
