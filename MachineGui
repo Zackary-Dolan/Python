@@ -1,5 +1,8 @@
 import customtkinter as ctk
 from tkinter import StringVar, END
+
+from seaborn import heatmap
+
 from PythonTrails import Quali_Machine_Learning
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,17 +15,25 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 window = ctk.CTk()
-window.geometry("545x600")
+window.geometry("545x800")
 window.title("A00322305")
 
 # ----------------------------------------------------------------------
 decisionTree = Quali_Machine_Learning()
-
+heatmap_popup = None
 
 def trainData():
     newSeedValue = int(seedsVar.get())
     decisionTree.updateSeed(newSeedValue)
     decisionTree.trainData()
+    text.delete("0.0", "end")
+    text.insert("end", "Example Inputs:\n")
+    text.insert("end", "driverId = 844\n")
+    text.insert("end", "constructorId = 131\n")
+    text.insert("end", "number = 44\n")
+    text.insert("end", "Position = 7\n")
+    text.insert("end", "Q1 = 1:16.928\n")
+    text.insert("end", "Q2 = 1:16.544\n")
 
 def testData():
     text.delete("0.0", "end")
@@ -55,7 +66,6 @@ def makeNewPrediction():
     position = int(entry44.get())
     q1 = decisionTree.lap_to_seconds(entry44a.get())
     q2 = decisionTree.lap_to_seconds(entry46a.get())
-    q3 = 0
 
     prediction_Res = decisionTree.makePrediction(driverId, constructorId, number, q1, q2)
 
@@ -67,9 +77,14 @@ def makeNewPrediction():
     entry45.insert(0, result)
 
 def show_confusion_matrix_popup(cm):
-    popup = ctk.CTkToplevel()
-    popup.title("Confusion Matrix")
-    popup.geometry("420x420")
+    global heatmap_popup
+    if heatmap_popup is not None and heatmap_popup.winfo_exists():
+        heatmap_popup.destroy()
+
+
+    heatmap_popup = ctk.CTkToplevel()
+    heatmap_popup.title("Confusion Matrix")
+    heatmap_popup.geometry("420x420")
 
     fig, ax = plt.subplots(figsize=(4, 4))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
@@ -81,15 +96,49 @@ def show_confusion_matrix_popup(cm):
     ax.set_ylabel("Actual")
     plt.tight_layout()
 
-    canvas = FigureCanvasTkAgg(fig, master=popup)
+    canvas = FigureCanvasTkAgg(fig, master=heatmap_popup)
     canvas.draw()
     canvas.get_tk_widget().pack(pady=10)
 
     # Close button
-    close_btn = ctk.CTkButton(popup, text="Close", command=popup.destroy)
+    close_btn = ctk.CTkButton(heatmap_popup, text="Close", command=heatmap_popup.destroy)
     close_btn.pack(pady=10)
 
-# ---------------------------- GUI ELEMENTS ----------------------------
+def show_driver_avg_popup(driver_list):
+    popup = ctk.CTkToplevel()
+    popup.title("Driver Average Times")
+    popup.geometry("450x350")
+
+    header = ctk.CTkLabel(popup, text="Average Lap Times", font=("Arial", 16, "bold"))
+    header.pack(pady=10)
+
+    text_box = ctk.CTkTextbox(popup, width=400, height=220)
+    text_box.pack(pady=10)
+
+    for d in driver_list:
+        if d.strip() == "":
+            continue
+
+        try:
+            d_int = int(d)
+        except:
+            text_box.insert("end", f"Driver '{d}' is not valid.\n\n")
+            continue
+
+        data = decisionTree.get_driver_average_times(d_int)
+
+        if data is None:
+            text_box.insert("end", f"Driver {d_int} not found in dataset.\n\n")
+            continue
+
+        # Format nicely
+        text_box.insert("end", f"Driver {d_int}\n")
+        text_box.insert("end", f"  Avg Q1: {data['Q1']:.3f} sec\n")
+        text_box.insert("end", f"  Avg Q2: {data['Q2']:.3f} sec\n")
+        text_box.insert("end", f"  Avg Q3: {data['Q3']:.3f} sec\n\n")
+
+    close_btn = ctk.CTkButton(popup, text="Close", command=popup.destroy)
+    close_btn.pack(pady=10)
 
 frame = ctk.CTkFrame(window, width=450, height=450)
 frame.place(x=10, y=100)
@@ -134,6 +183,7 @@ label3 = ctk.CTkLabel(frame, text="Output",
 label3.grid(row=2, column=0)
 
 text = ctk.CTkTextbox(frame, height=140, width=250)
+
 text.grid(row=2, column=1, sticky="ew")
 
 label02 = ctk.CTkLabel(frame, text=" ", text_color="red", font=("Arial", 16, "bold"))
@@ -186,7 +236,6 @@ button3.grid(row=13, column=1, sticky="ew")
 entry45 = ctk.CTkEntry(frame)
 entry45.grid(row=12, column=1, sticky="ew")
 
-# ---------------------------- EXTRA BOX ----------------------------
 
 # label02a = ctk.CTkLabel(frame, text=" ", text_color="red", font=("Arial", 16, "bold"))
 # label02a.grid(row=13, column=0, columnspan=2, sticky="ew")
@@ -202,6 +251,32 @@ entry45.grid(row=12, column=1, sticky="ew")
 # textb.insert("end", '\nNo numbers ever')
 # textb.insert("end", '\nResting ecg - 100million')
 # textb.insert("end", '\nheart rate = Formula 1 + gun at head :)')
+
+label_avg_title = ctk.CTkLabel(frame, text="Compare 4 Drivers", text_color="white", font=("Arial", 14, "bold"))
+label_avg_title.grid(row=14, column=1, pady=10)
+
+label_d1 = ctk.CTkLabel(frame, text="Driver 1 ID:", text_color="white")
+label_d1.grid(row=15, column=0)
+entry_d1 = ctk.CTkEntry(frame)
+entry_d1.grid(row=15, column=1)
+
+label_d2 = ctk.CTkLabel(frame, text="Driver 2 ID:", text_color="white")
+label_d2.grid(row=16, column=0)
+entry_d2 = ctk.CTkEntry(frame)
+entry_d2.grid(row=16, column=1)
+
+label_d3 = ctk.CTkLabel(frame, text="Driver 3 ID:", text_color="white")
+label_d3.grid(row=17, column=0)
+entry_d3 = ctk.CTkEntry(frame)
+entry_d3.grid(row=17, column=1)
+
+label_d4 = ctk.CTkLabel(frame, text="Driver 4 ID:", text_color="white")
+label_d4.grid(row=18, column=0)
+entry_d4 = ctk.CTkEntry(frame)
+entry_d4.grid(row=18, column=1)
+
+btn_compare = ctk.CTkButton(frame, text="Show Average Times", command=lambda: show_driver_avg_popup([entry_d1.get(), entry_d2.get(), entry_d3.get(), entry_d4.get()]))
+btn_compare.grid(row=19, column=1, pady=10)
 
 #--------just for looks---------------
 label02a = ctk.CTkLabel(frame,  text="                                             ", text_color="white", font=("Arial", 10, "bold"))
